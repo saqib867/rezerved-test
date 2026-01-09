@@ -47,7 +47,11 @@ export function usePaymentRequests(status: string) {
 
   const fetchRequests = async (loadMore = false) => {
     try {
-      loadMore ? setLoadingMore(true) : setLoading(true);
+      if (loadMore) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
 
       const q = buildQuery(loadMore);
