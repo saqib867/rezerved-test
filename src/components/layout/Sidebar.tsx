@@ -40,7 +40,7 @@ const Sidebar = () => {
       <div className="flex flex-col gap-4 flex-grow">
         <div className="flex items-center justify-center w-full">
           <Image
-            src="/images/logo.svg"
+            src="/images/rez.png"
             alt="Rezerved logo"
             width={158}
             height={65}
