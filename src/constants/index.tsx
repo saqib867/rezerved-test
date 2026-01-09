@@ -1,4 +1,3 @@
-import user from "../../public/images/user.svg";
 import { PaymentTypes } from "@/types/PaymentTypes";
 import { MenueItemsTypes } from "@/types/CommonTypes";
 import { RiDashboardLine, RiFileListLine } from "react-icons/ri";
@@ -7,6 +6,7 @@ import { TbUsersGroup } from "react-icons/tb";
 import { TfiAnnouncement } from "react-icons/tfi";
 import { UserTypes } from "@/types/UserTypes";
 
+const user = "/images/user.svg";
 export const menuItems: MenueItemsTypes[] = [
   { name: "Dashboard", icon: RiDashboardLine, route: "/dashboard" },
   { name: "Payments", icon: HiArrowsRightLeft, route: "/dashboard/payments" },
