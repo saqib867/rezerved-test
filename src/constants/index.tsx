@@ -54,11 +54,11 @@ export const paymentTabs = [
 ];
 
 // user
-export const userData: UserTypes[] = [
+export const userData: any[] = [
   {
     userId: "1",
     name: "Ahmad",
-    img: user,
+    img: user!,
     email: "ahmad@gmail.com",
     status: "Active",
   },
