@@ -41,7 +41,7 @@ const Sidebar = () => {
         <div className="flex items-center justify-center w-full">
           <Image
             src="/images/logo.svg"
-            alt="bus logo"
+            alt="Rezerved logo"
             width={158}
             height={65}
             className="mt-8 mb-14"
