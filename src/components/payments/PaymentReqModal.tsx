@@ -42,7 +42,7 @@ const PaymentReqModal = ({
 
       await updateDoc(ref, {
         status: "paid",
-        dateTime: new Date(), // optional: update completion time
+        // dateTime: new Date(), // optional: update completion time
       });
 
       await updateDoc(userRef, {
@@ -87,38 +87,47 @@ const PaymentReqModal = ({
   };
 
   const handleCancelAmount = async (id: string) => {
-    const ref = doc(db, "PaymentRequests", id);
-    const userRef = doc(db, "Users", payment!.userID);
-    await updateDoc(userRef, {
-      currentRequestedAmount: increment(-payment!.amount),
-    });
-    await updateDoc(ref, {
-      status: "rejected",
-      dateTime: new Date(), // optional: update completion time
-    });
-    const descripttion = `Payment request for $${payment?.amount} has been rejected by admin`;
-    const datetime = Timestamp.now();
+    console.log("amount id => ", id);
+    try {
+      setSubmitting(true);
+      const ref = doc(db, "PaymentRequests", id);
+      const userRef = doc(db, "Users", payment!.userID);
+      await updateDoc(userRef, {
+        currentRequestedAmount: increment(-payment!.amount),
+      });
+      await updateDoc(ref, {
+        status: "rejected",
+        // dateTime: new Date(), // optional: update completion time
+      });
+      const descripttion = `Payment request for $${payment?.amount} has been rejected by admin`;
+      const datetime = Timestamp.now();
 
-    const notificationType = "paymentRejected";
-    const receiverUID = payment?.userID;
-    const senderUID = "admin";
-    const title = "Payment Request Rejected";
-    const docRef = doc(collection(db, "Notifications"));
-    const docId = docRef.id;
+      const notificationType = "paymentRejected";
+      const receiverUID = payment?.userID;
+      const senderUID = "admin";
+      const title = "Payment Request Rejected";
+      const docRef = doc(collection(db, "Notifications"));
+      const docId = docRef.id;
 
-    // Save the document with its own ID
-    await setDoc(docRef, {
-      id: docId, // save ID inside the doc
-      senderUID: senderUID,
-      receiverUID: receiverUID,
-      notificationType: notificationType,
-      title: title,
-      description: descripttion,
-      datetime: datetime,
-      isRead: false,
-      notificationID: docId,
-    });
-    handleCloseModal();
+      // Save the document with its own ID
+      await setDoc(docRef, {
+        id: docId, // save ID inside the doc
+        senderUID: senderUID,
+        receiverUID: receiverUID,
+        notificationType: notificationType,
+        title: title,
+        description: descripttion,
+        datetime: datetime,
+        isRead: false,
+        notificationID: docId,
+      });
+      handleCloseModal();
+      setSubmitting(false);
+      toast.success("Payment request has been rejected");
+    } catch (error) {
+      console.log("error => ", error);
+      toast.error("Failed to reject the payment request");
+    }
   };
 
   return (
@@ -167,14 +176,12 @@ const PaymentReqModal = ({
       ) : (
         payment?.status == "pending" && (
           <div className="flex justify-between gap-4 h-[54px]">
-            <CustomButton
-              width="50%"
-              bgColor="#FB1B1B"
-              textColor="#F8F8F8"
-              radius="32px"
-              text="Close"
+            <button
               onClick={() => handleCancelAmount(payment?.requestID!)}
-            />
+              className="bg-[#FB1B1B] p-3 rounded-full w-[50%]"
+            >
+              Close
+            </button>
             <button
               onClick={() => markPaymentRequestAsPaid(payment?.requestID!)}
               className="bg-green-600 w-[50%] text-white p-3 rounded-full"
