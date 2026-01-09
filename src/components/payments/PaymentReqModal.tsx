@@ -5,11 +5,20 @@ import { FaArrowUp } from "react-icons/fa6";
 import Image from "next/image";
 import BankInfoCard from "./BankInfoCard";
 import CustomButton from "../reuseableComponents/CustomButton";
-import { doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  increment,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import { useState } from "react";
 import { BiLoader } from "react-icons/bi";
 import toast from "react-hot-toast";
+import { format } from "date-fns";
+import { close } from "fs";
 
 interface PaymentReqModalProps {
   isModalOpen: boolean;
@@ -23,14 +32,47 @@ const PaymentReqModal = ({
 }: PaymentReqModalProps) => {
   const [submitting, setSubmitting] = useState(false);
   // update payment type
+
+  console.log("payment details => ", payment);
   const markPaymentRequestAsPaid = async (id: string) => {
     try {
       setSubmitting(true);
       const ref = doc(db, "PaymentRequests", id);
+      const userRef = doc(db, "Users", payment!.userID);
 
       await updateDoc(ref, {
         status: "paid",
         dateTime: new Date(), // optional: update completion time
+      });
+
+      await updateDoc(userRef, {
+        currentRequestedAmount: increment(-payment!.amount),
+        pendingClearance: increment(-payment!.amount),
+      });
+
+      // const date = payment?.dateTime?.toDate();
+      // const formateDate = format(date!, "dd MMM yyyy h:mm a");
+      const descripttion = `Payment request for $${payment?.amount} has been approved by admin`;
+      const datetime = Timestamp.now();
+
+      const notificationType = "paymentApproved";
+      const receiverUID = payment?.userID;
+      const senderUID = "admin";
+      const title = "Payment Request Approved";
+      const docRef = doc(collection(db, "Notifications"));
+      const docId = docRef.id;
+
+      // Save the document with its own ID
+      await setDoc(docRef, {
+        id: docId, // save ID inside the doc
+        senderUID: senderUID,
+        receiverUID: receiverUID,
+        notificationType: notificationType,
+        title: title,
+        description: descripttion,
+        datetime: datetime,
+        isRead: false,
+        notificationID: docId,
       });
 
       handleCloseModal();
@@ -42,6 +84,41 @@ const PaymentReqModal = ({
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleCancelAmount = async (id: string) => {
+    const ref = doc(db, "PaymentRequests", id);
+    const userRef = doc(db, "Users", payment!.userID);
+    await updateDoc(userRef, {
+      currentRequestedAmount: increment(-payment!.amount),
+    });
+    await updateDoc(ref, {
+      status: "rejected",
+      dateTime: new Date(), // optional: update completion time
+    });
+    const descripttion = `Payment request for $${payment?.amount} has been rejected by admin`;
+    const datetime = Timestamp.now();
+
+    const notificationType = "paymentRejected";
+    const receiverUID = payment?.userID;
+    const senderUID = "admin";
+    const title = "Payment Request Rejected";
+    const docRef = doc(collection(db, "Notifications"));
+    const docId = docRef.id;
+
+    // Save the document with its own ID
+    await setDoc(docRef, {
+      id: docId, // save ID inside the doc
+      senderUID: senderUID,
+      receiverUID: receiverUID,
+      notificationType: notificationType,
+      title: title,
+      description: descripttion,
+      datetime: datetime,
+      isRead: false,
+      notificationID: docId,
+    });
+    handleCloseModal();
   };
 
   return (
@@ -96,7 +173,7 @@ const PaymentReqModal = ({
               textColor="#F8F8F8"
               radius="32px"
               text="Close"
-              onClick={handleCloseModal}
+              onClick={() => handleCancelAmount(payment?.requestID!)}
             />
             <button
               onClick={() => markPaymentRequestAsPaid(payment?.requestID!)}

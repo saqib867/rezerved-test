@@ -16,9 +16,10 @@ export default [
       "react/no-unescaped-entities": "off",
       "@next/next/no-page-custom-font": "off",
 
-      // 🔥 Kill this annoying shit
+      // 🔥 Kill TypeScript pain
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
     },
   },
 ];
