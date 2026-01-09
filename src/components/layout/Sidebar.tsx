@@ -40,7 +40,7 @@ const Sidebar = () => {
       <div className="flex flex-col gap-4 flex-grow">
         <div className="flex items-center justify-center w-full">
           <Image
-            src="/images/rez.png"
+            src="https://firebasestorage.googleapis.com/v0/b/rezerved-c57af.firebasestorage.app/o/rez.png?alt=media&token=91b4da9e-5c2d-4c1e-a183-5c565d939362"
             alt="Rezerved logo"
             width={158}
             height={65}
