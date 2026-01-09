@@ -5,7 +5,7 @@ import { getStorage } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyAPJoeErCP_5W4fy6FJf4coqNBCj1Ej0C8",
+  apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "rezerved-c57af.firebaseapp.com",
   projectId: "rezerved-c57af",
   storageBucket: "rezerved-c57af.firebasestorage.app",
